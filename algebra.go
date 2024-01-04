@@ -59,6 +59,23 @@ func (algebra *Algebra) NewVector(componentValues ...float64) *Vector {
 	return vec
 }
 
+func (algebra *Algebra) NewScalar(value float64) *Vector {
+	c := Component{
+		Algebra: algebra,
+		Value:   value,
+		Basis:   nil,
+	}
+	return algebra.NewVectorWithComponents(c)
+}
+
+func (algebra *Algebra) NewVectorWithComponents(components ...Component) *Vector {
+	v := algebra.NewVector()
+	for _, c := range components {
+		v.addComponentInternal(c)
+	}
+	return v
+}
+
 func (algebra *Algebra) SimplifyBasis(basis []*Basis) (int, []*Basis) {
 	multiplier, basis := algebra.SortBasis(basis)
 	for i := 0; i < len(basis)-1; i++ {

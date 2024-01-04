@@ -10,10 +10,12 @@ func TestSimpleVector(t *testing.T) {
 	a := NewAlgebraWithNumDimensions(3)
 	v := a.NewVector(1, 2, 3)
 	v2 := a.NewVector(4, 5, 6)
+	newV := v.Multiply(v2)
 	fmt.Printf("%+v\n", a)
 	fmt.Printf("%v\n", v)
 	fmt.Printf("%v\n", v2)
-	fmt.Printf("%v\n", v.Multiply(v2))
+	fmt.Printf("%v\n", newV)
 	fmt.Printf("%v\n", v2.Multiply(v))
 	fmt.Printf("%f\n", v2.Multiply(v).ScalarComponent())
+	fmt.Printf("%v\n", newV.Multiply(a.NewScalar(3)))
 }
