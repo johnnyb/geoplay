@@ -54,3 +54,21 @@ func (c Component) HasBasis(basis []*Basis) bool {
 	}
 	return true
 }
+
+func (c Component) Dup() Component {
+	newC := Component{
+		Algebra: c.Algebra,
+		Value:   c.Value,
+		Basis:   c.Basis,
+	}
+	return newC
+}
+
+func (c Component) DupWithNewValue(newval float64) Component {
+	newC := Component{
+		Algebra: c.Algebra,
+		Value:   newval,
+		Basis:   c.Basis,
+	}
+	return newC
+}
