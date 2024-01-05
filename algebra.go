@@ -125,3 +125,21 @@ func (algebra *Algebra) SortBasis(basis []*Basis) (int, []*Basis) {
 
 	return multiplier, newBasis
 }
+
+func (algebra *Algebra) ComplementBasis(original []*Basis) []*Basis {
+	newBasis := []*Basis{}
+	for _, currentBasis := range algebra.Basis {
+		found := false
+		for _, originalBasis := range original {
+			if currentBasis == originalBasis {
+				found = true
+				break
+			}
+		}
+		if !found {
+			newBasis = append(newBasis, currentBasis)
+		}
+	}
+
+	return newBasis
+}

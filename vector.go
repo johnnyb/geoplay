@@ -66,6 +66,15 @@ func (v *Vector) addComponentInternal(c Component) {
 	v.Components = append(v.Components, c)
 }
 
+func (v *Vector) Complement() *Vector {
+	algebra := v.Algebra
+	newV := algebra.NewVectorWithComponents(v.Components...)
+	for idx := range newV.Components {
+		newV.Components[idx].Basis = algebra.ComplementBasis(newV.Components[idx].Basis)
+	}
+	return newV
+}
+
 func (v *Vector) String() string {
 	str := ""
 	for _, comp := range v.Components {

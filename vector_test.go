@@ -14,6 +14,7 @@ func TestSimpleVector(t *testing.T) {
 	fmt.Printf("%+v\n", a)
 	fmt.Printf("%v\n", v)
 	fmt.Printf("%v\n", v2)
+	fmt.Printf("%v\n", v2.Complement())
 	fmt.Printf("%v\n", newV)
 	fmt.Printf("%v\n", v2.Multiply(v))
 	fmt.Printf("%f\n", v2.Multiply(v).ScalarComponent())
