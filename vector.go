@@ -2,10 +2,11 @@ package geoplay
 
 // Vector is the struct used to handle all multicomponent values.
 type Vector struct {
-	Algebra    *Algebra
-	Components []Component
+	Algebra    *Algebra    // The Algebra that the Vector is a part of
+	Components []Component // The Components of the Vector
 }
 
+// Dup duplicates the vector.
 func (v *Vector) Dup() *Vector {
 	comps := append([]Component{}, v.Components...)
 	newV := Vector{
@@ -16,44 +17,15 @@ func (v *Vector) Dup() *Vector {
 	return &newV
 }
 
-func (v *Vector) Multiply(other *Vector) *Vector {
-	newV := v.Algebra.NewVector()
-	for _, c1 := range v.Components {
-		for _, c2 := range other.Components {
-			newComponent := c1.Multiply(c2)
-			newV.addComponentInternal(newComponent)
-		}
-	}
-
-	return newV
-}
-
-func (v *Vector) Add(other *Vector) *Vector {
-	newV := v.Algebra.NewVector()
-	newV.addComponentsInternal(v.Components...)
-	newV.addComponentsInternal(other.Components...)
-	return newV
-}
-
-func (v *Vector) Sub(other *Vector) *Vector {
-	newV := v.Algebra.NewVector()
-	newV.addComponentsInternal(v.Components...)
-	for _, c := range other.Components {
-		newV.addComponentInternal(c.DupWithNewValue(-c.Value))
-	}
-	return newV
-}
-
-func (v *Vector) AddComponent(cList ...Component) *Vector {
-	newV := v.Dup()
-	newV.addComponentsInternal(cList...)
-	return newV
-}
-
+// ScalarComponent is a helper function extracts the scalar
+// part of a vector.
 func (v *Vector) ScalarComponent() float64 {
 	return v.ComponentForBasis(nil).Value
 }
 
+// ComponentForBasis extracts the given component from the
+// Vector.  It returns a Component with a Value of 0 if none
+// is found within the Vector.
 func (v *Vector) ComponentForBasis(basis []*Basis) Component {
 	for _, comp := range v.Components {
 		if comp.HasBasis(basis) {
@@ -68,12 +40,18 @@ func (v *Vector) ComponentForBasis(basis []*Basis) Component {
 	}
 }
 
+// addComponentsInternal is a helper function which performs
+// addComponentInternal on a variadic list.
 func (v *Vector) addComponentsInternal(cList ...Component) {
 	for _, c := range cList {
 		v.addComponentInternal(c)
 	}
 }
 
+// addComponentInternal adds a given component to the vector,
+// but *modifies* the vector itself.  This is only really valid
+// when initially creating a vector internal to the system before
+// sending the result outside of the system.
 func (v *Vector) addComponentInternal(c Component) {
 	for idx, comp := range v.Components {
 		if comp.HasBasis(c.Basis) {
@@ -95,23 +73,7 @@ func (v *Vector) addComponentInternal(c Component) {
 	v.Components = append(v.Components, c)
 }
 
-func (v *Vector) Complement() *Vector {
-	algebra := v.Algebra
-	newV := algebra.NewVectorWithComponents(v.Components...)
-	for idx := range newV.Components {
-		newV.Components[idx].Basis = algebra.ComplementBasis(newV.Components[idx].Basis)
-	}
-	return newV
-}
-
-func (v *Vector) DotProduct(other *Vector) *Vector {
-	return v.Algebra.NewScalar(0.5).Multiply(v.Multiply(other).Add(other.Multiply(v)))
-}
-
-func (v *Vector) WedgeProduct(other *Vector) *Vector {
-	return v.Algebra.NewScalar(0.5).Multiply(v.Multiply(other).Sub(other.Multiply(v)))
-}
-
+// String yields the string representation of the vector.
 func (v *Vector) String() string {
 	str := ""
 	for _, comp := range v.Components {
