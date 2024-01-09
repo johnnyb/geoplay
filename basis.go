@@ -4,6 +4,7 @@ package geoplay
 // A basis should *always* be passed by pointer, as basis comparisons are
 // generally done as pointer comparisons, not name comparisons (importing into a different algebra is based on name, however).
 type Basis struct {
-	Algebra *Algebra
-	Name    string
+	Algebra     *Algebra
+	Name        string
+	BasisSquare int
 }

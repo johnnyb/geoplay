@@ -6,6 +6,8 @@ import "fmt"
 type Algebra struct {
 	Basis              []*Basis
 	BasisPositionCache map[*Basis]int
+	ZeroCutoffPositive float64
+	ZeroCutoffNegative float64
 }
 
 func NewAlgebraWithNumDimensions(numDimensions int) *Algebra {
@@ -16,6 +18,22 @@ func NewAlgebraWithNumDimensions(numDimensions int) *Algebra {
 	return NewAlgebra(dimensionNames...)
 }
 
+func NewAlgebraWithBasis(basis []*Basis) *Algebra {
+	algebra := &Algebra{Basis: basis}
+	algebra.cacheBasisPositions()
+	return algebra
+}
+
+func NewAlgebraClifford(numsqzero, numsqnegone int) *Algebra {
+	algebra := NewAlgebraWithNumDimensions(numsqzero + numsqnegone)
+	for idx, b := range algebra.Basis {
+		if idx >= numsqzero {
+			b.BasisSquare = -1
+		}
+	}
+	return algebra
+}
+
 // NewAlgebra creates a new Clifford Algebra with the given dimension names.
 func NewAlgebra(dimensions ...string) *Algebra {
 	algebra := &Algebra{
@@ -23,8 +41,9 @@ func NewAlgebra(dimensions ...string) *Algebra {
 	}
 	for _, dim := range dimensions {
 		basis := &Basis{
-			Algebra: algebra,
-			Name:    dim,
+			Algebra:     algebra,
+			Name:        dim,
+			BasisSquare: 1,
 		}
 		algebra.Basis = append(algebra.Basis, basis)
 	}
@@ -76,10 +95,20 @@ func (algebra *Algebra) NewVectorWithComponents(components ...Component) *Vector
 	return v
 }
 
+func (algebra *Algebra) IsZeroEquivalent(val float64) bool {
+	return val >= algebra.ZeroCutoffNegative && val <= algebra.ZeroCutoffPositive
+}
+
+func (algebra *Algebra) SetZeroCutoff(val float64) {
+	algebra.ZeroCutoffNegative = -val
+	algebra.ZeroCutoffPositive = val
+}
+
 func (algebra *Algebra) SimplifyBasis(basis []*Basis) (int, []*Basis) {
 	multiplier, basis := algebra.SortBasis(basis)
 	for i := 0; i < len(basis)-1; i++ {
 		if basis[i] == basis[i+1] {
+			multiplier = multiplier * basis[i].BasisSquare
 			if i == 0 {
 				basis = basis[i+2:]
 			} else {

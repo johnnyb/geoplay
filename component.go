@@ -32,7 +32,7 @@ func (c Component) String() string {
 	basisStr := ""
 	for _, basis := range c.Basis {
 		if basisStr != "" {
-			basisStr += "^"
+			basisStr += ","
 		}
 		basisStr += basis.Name
 	}

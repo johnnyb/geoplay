@@ -60,13 +60,14 @@ func (v *Vector) addComponentInternal(c Component) {
 				Value:   comp.Value + c.Value,
 				Basis:   comp.Basis,
 			}
-			if v.Components[idx].Value == 0 {
+			if v.Algebra.IsZeroEquivalent(v.Components[idx].Value) {
 				if idx == 0 {
 					v.Components = v.Components[1:]
 				} else {
 					v.Components = append(v.Components[0:idx], v.Components[idx+1:]...)
 				}
 			}
+
 			return
 		}
 	}
